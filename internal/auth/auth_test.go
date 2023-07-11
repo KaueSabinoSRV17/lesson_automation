@@ -19,10 +19,7 @@ func TestAuthenticate(t *testing.T) {
 		t.Error("Env vars are null")
 	}
 
-	token, err := Authenticate(cpf, password)
-	if err != nil || token == "" {
-		t.Error("Could not authenticate")
-	}
+	token := Authenticate(cpf, password)
 
 	regexForToken := regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]+$`)
 	isAValidToken := !regexForToken.MatchString(token)

@@ -25,7 +25,7 @@ func Authenticate(cpf, password string) (string, error) {
 	}
 
 	response, err := http.Post(url, studeoapi.JsonContentType, bytes.NewBuffer(json))
-	if err != nil {
+	if err != nil || response.StatusCode != 200 {
 		log.Fatal("Could not Authenticate:\n\t" + err.Error())
 		return "", err
 	}

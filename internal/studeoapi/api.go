@@ -7,6 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Client struct {
@@ -15,11 +18,30 @@ type Client struct {
 	httpClient *http.Client
 }
 
+type AuthResponse struct {
+	Token string `json:"token"`
+}
+
 var BaseUrl = "https://studeoapi.unicesumar.edu.br"
 var JsonContentType = "application/json"
 var Instance = Client{
 	BaseUrl:    BaseUrl,
 	httpClient: http.DefaultClient,
+}
+
+func AuthenticatedInstance() (Client, error) {
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		return Client{}, err
+	}
+	cpf := os.Getenv("CPF")
+	password := os.Getenv("PASSWORD")
+	token := Authenticate(cpf, password)
+	return Client{
+		BaseUrl:    BaseUrl,
+		Token:      token,
+		httpClient: http.DefaultClient,
+	}, nil
 }
 
 func (c *Client) Get(path string, body, resultReference interface{}) (string, error) {
@@ -80,11 +102,15 @@ func (c *Client) do(request *http.Request, resultReference interface{}) (string,
 	if err != nil {
 		return "", err
 	}
-	defer response.Body.Close()
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return "", err
+	}
+
+	err = json.Unmarshal([]byte(body), resultReference)
+	if err != nil {
+		log.Fatal("Could not Unmarshal http result")
 	}
 
 	return string(body), err

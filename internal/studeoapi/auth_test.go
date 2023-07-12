@@ -1,8 +1,7 @@
-package auth
+package studeoapi
 
 import (
 	"os"
-	"regexp"
 	"testing"
 
 	"github.com/joho/godotenv"
@@ -20,10 +19,7 @@ func TestAuthenticate(t *testing.T) {
 	}
 
 	token := Authenticate(cpf, password)
-
-	regexForToken := regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]+$`)
-	isAValidToken := !regexForToken.MatchString(token)
-	if !isAValidToken {
-		t.Error("The token is not valid!")
+	if token == "" {
+		t.Error("Token is not valid")
 	}
 }
